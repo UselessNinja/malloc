@@ -41,5 +41,4 @@ void free(void *ptr)
     } else {
         header->is_free = true;
     }
-    return;
 }
