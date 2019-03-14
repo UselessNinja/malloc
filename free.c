@@ -9,11 +9,10 @@
 
 void delete_pointers()
 {
-    header_malloc_t *buffer;
+    header_malloc_t *buffer = start;
 
-    buffer = start;
     while (buffer) {
-        if(buffer->next == end) {
+        if (buffer->next == end) {
             buffer->next = NULL;
             end = buffer;
         }
@@ -28,6 +27,7 @@ void free(void *ptr)
 
     if (!ptr)
         return;
+    pthread_mutex_lock(&lock);
     header = (header_malloc_t*)ptr - 1;
     pbrk = sbrk(0);
     if ((char*)ptr + header->size == pbrk) {
@@ -37,8 +37,9 @@ void free(void *ptr)
         } else {
             delete_pointers();
         }
-        sbrk(0 - sizeof(header_malloc_t) - header->size);
+        sbrk((0 - sizeof(header_malloc_t) - header->size));
     } else {
         header->is_free = true;
     }
+    pthread_mutex_unlock(&lock);
 }

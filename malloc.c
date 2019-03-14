@@ -10,16 +10,19 @@
 header_malloc_t *look_for_available_memory(size_t size)
 {
     header_malloc_t *temp = start;
+
     while (temp != NULL) {
-        if (temp->is_free == true && temp->size >= size)
-            return temp;
+        if (temp->is_free && temp->size >= size)
+            return (temp);
         temp = temp->next;
     }
     return (NULL);
 }
 
-void update_header (header_malloc_t *header, size_t size)
+header_malloc_t *update_header
+    (header_malloc_t *header, size_t size, void *memory_block)
 {
+    header = memory_block;
     header->size = size;
     header->is_free = false;
     header->next = NULL;
@@ -28,26 +31,29 @@ void update_header (header_malloc_t *header, size_t size)
     if (end)
         end->next = header;
     end = header;
+    pthread_mutex_unlock(&lock);
+    return (header);
 }
 
 void *malloc(size_t size)
 {
-    size_t size_used;
     void *memory_block;
     header_malloc_t *header;
 
+    pthread_mutex_lock(&lock);
     if (!size)
         return (NULL);
     header = look_for_available_memory(size);
     if (header != NULL) {
         header->is_free = false;
+        pthread_mutex_unlock(&lock);
         return (void*)(header + 1);
     }
-    size_used = (sizeof(header_malloc_t) + size);
-    memory_block = sbrk(size_used);
-    if (memory_block == (void*) - 1)
+    memory_block = sbrk((sizeof(header_malloc_t) + size));
+    if (memory_block == (void*) - 1) {
+        pthread_mutex_unlock(&lock);
         return (NULL);
-    header = memory_block;
-    update_header(header, size);
+    }
+    header = update_header(header, size, memory_block);
     return (void*)(header + 1);
 }

@@ -12,10 +12,12 @@ void *realloc(void *ptr, size_t size)
     header_malloc_t *header;
     void *reallocated_memory;
 
-    if (!ptr)
+    if (!ptr && size != 0)
         return (malloc(size));
-    if (!size)
-        return (ptr);
+    if (size == 0) {
+        free(ptr);
+        return (NULL);
+    }
     header = (header_malloc_t*)ptr - 1;
     if (header->size >= size)
         return ptr;

@@ -14,8 +14,8 @@
 #define MALLOC_H_
 
 typedef enum boolean {
-    true,
-    false
+    false,
+    true
 } bool;
 
 typedef struct header_malloc_s {
@@ -26,6 +26,7 @@ typedef struct header_malloc_s {
 
 header_malloc_t *start;
 header_malloc_t *end;
+pthread_mutex_t lock;
 
 void *malloc(size_t size);
 void *realloc(void *ptr, size_t size);
