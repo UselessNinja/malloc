@@ -19,8 +19,7 @@ header_malloc_t *look_for_available_memory(size_t size)
     return (NULL);
 }
 
-header_malloc_t *update_header
-    (header_malloc_t *header, size_t size, void *memory_block)
+header_malloc_t *update_header (header_malloc_t *header, size_t size, void *memory_block)
 {
     header = memory_block;
     header->size = size;
