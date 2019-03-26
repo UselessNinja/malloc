@@ -7,7 +7,7 @@
 
 #include "malloc.h"
 
-void delete_pointers()
+void delete_pointers(void)
 {
     header_malloc_t *buffer = start;
 
